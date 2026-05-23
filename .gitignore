@@ -1,0 +1,26 @@
+# Credenciais — NUNCA commitar
+.env
+.env.local
+*.key
+
+# Cache local
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+.claude/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IMPORTANTE: data/flights.db e reports/*.{xlsx,html} SÃO commitados pelo workflow
+# para garantir persistência do histórico entre runs do GitHub Actions.
+# Apenas o journal/wal do SQLite (transitório) é ignorado:
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm

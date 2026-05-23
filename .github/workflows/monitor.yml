@@ -1,0 +1,89 @@
+name: Flight Monitor
+
+on:
+  # O cron-job.org dispara nos horarios programados (08:17/14:23/20:19 BRT)
+  # via repository_dispatch. Mais confiavel que o scheduled cron do GitHub.
+  # Se um dia quiser reativar o backup interno do GitHub, descomente o
+  # bloco 'schedule:' abaixo (vai dobrar sweeps quando os dois funcionarem).
+  #
+  # schedule:
+  #   - cron: "17 11 * * *"   # 08:17 BRT
+  #   - cron: "23 17 * * *"   # 14:23 BRT
+  #   - cron: "19 23 * * *"   # 20:19 BRT
+  repository_dispatch:
+    types: [scheduled-run]
+  workflow_dispatch:
+    inputs:
+      force_serpapi:
+        description: "Forçar verificação SerpAPI top-N (mesmo fora de segunda)"
+        required: false
+        default: "false"
+      force_serpapi_full:
+        description: "Forçar SerpAPI full sweep 12 hubs (mesmo fora de seg/qui)"
+        required: false
+        default: "false"
+      report_only:
+        description: "Apenas regerar relatórios (sem chamar APIs)"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write   # Necessário para o job commitar o DB e relatórios de volta no repo
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run flight monitor
+        env:
+          TRAVELPAYOUTS_TOKEN: ${{ secrets.TRAVELPAYOUTS_TOKEN }}
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ALERT_RECIPIENT: ${{ secrets.ALERT_RECIPIENT }}
+          FORCE_SERPAPI_CHECK: ${{ github.event.inputs.force_serpapi == 'true' && '1' || '' }}
+          FORCE_SERPAPI_FULL: ${{ github.event.inputs.force_serpapi_full == 'true' && '1' || '' }}
+        run: |
+          if [ "${{ github.event.inputs.report_only }}" = "true" ]; then
+            python monitor.py --report-only
+          else
+            python monitor.py
+          fi
+
+      - name: Upload reports as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: flight-reports-${{ github.run_number }}
+          path: |
+            docs/flights.xlsx
+            docs/index.html
+            data/flights.db
+          retention-days: 30
+
+      - name: Commit DB and reports back to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/flights.db docs/flights.xlsx docs/index.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Monitor run $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git push
+          else
+            echo "Sem mudanças para commitar."
+          fi

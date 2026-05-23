@@ -1,0 +1,59 @@
+# =============================================================================
+# Configuracao da viagem monitorada: Ana - DUB -> KEF (one-way, 27/09/2026)
+# =============================================================================
+# Veja CUSTOMIZE.md para customizacoes.
+
+# -----------------------------------------------------------------------------
+# 1. TRIP
+# -----------------------------------------------------------------------------
+trip:
+  origin: DUB                       # Dublin
+  destination: KEF                  # Reykjavik (Keflavik)
+  destination_name: Reykjavik
+  outbound_date: 2026-09-27         # Data da ida
+  return_date:                      # Vazio = one-way
+  passengers: 1
+  cabin_class: economy
+  checked_bag: true
+
+# -----------------------------------------------------------------------------
+# 2. HUBS — apenas para nome amigavel no dashboard (NAO filtra busca)
+# -----------------------------------------------------------------------------
+# Voos DUB-KEF tem opcoes diretas (Icelandair, Aer Lingus) e via hubs europeus.
+# A busca real e' DUB->KEF one-way no Google Flights; o que retornar com layover,
+# se for nessa lista, ganha nome de cidade. Hubs extras (nao listados) aparecem
+# so como codigo IATA, sem problema.
+hubs:
+  - { code: LHR, city: "London Heathrow", region: "UK"   }
+  - { code: LGW, city: "London Gatwick",  region: "UK"   }
+  - { code: MAN, city: "Manchester",      region: "UK"   }
+  - { code: AMS, city: "Amsterdam",       region: "EU-W" }
+  - { code: CDG, city: "Paris CDG",       region: "EU-W" }
+  - { code: FRA, city: "Frankfurt",       region: "EU-C" }
+  - { code: CPH, city: "Copenhagen",      region: "EU-N" }
+  - { code: OSL, city: "Oslo",            region: "EU-N" }
+  - { code: ARN, city: "Stockholm",       region: "EU-N" }
+
+# -----------------------------------------------------------------------------
+# 3. CONSTRAINTS
+# -----------------------------------------------------------------------------
+constraints:
+  direct_only: false                # true = somente voo direto
+  through_checked_bag_required: true
+  max_connection_hours: 6
+
+# -----------------------------------------------------------------------------
+# 4. MONITORING
+# -----------------------------------------------------------------------------
+monitoring:
+  currency: EUR                     # Trecho europeu, default EUR
+  dashboard_url: "https://voxjurtech.github.io/flight-monitor-dub-kef/"
+  alert_email: ""                   # Fallback (real fica em ALERT_RECIPIENT secret)
+  alert_min_drop_pct: 10
+  full_sweep_dow: 0
+  top_n_for_serpapi: 3
+  # Voos elegiveis para alerta: chegada em KEF entre 08:00 e 12:00 (hora local).
+  # Islandia nao tem horario de verao, KEF = UTC+0 ano inteiro.
+  arrival_window:
+    start: "08:00"
+    end:   "12:00"
