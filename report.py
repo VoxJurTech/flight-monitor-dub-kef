@@ -14,7 +14,7 @@ import sqlite3
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-from filters import in_arrival_window, has_window, window_label
+from filters import in_arrival_window, has_window, window_label, currency_symbol
 
 # Brasil = UTC-3 fixo (sem horario de verao desde 2019).
 BRT = timezone(timedelta(hours=-3))
@@ -324,15 +324,15 @@ new Chart(ctx, {
     interaction: { mode: 'index', intersect: false },
     scales: {
       y: {
-        title: { display: true, text: 'Preço (BRL)' },
-        ticks: { callback: v => 'R$ ' + v.toLocaleString('pt-BR') }
+        title: { display: true, text: 'Preço ({{currency_code}})' },
+        ticks: { callback: v => '{{currency_symbol}} ' + v.toLocaleString('pt-BR') }
       },
       x: { title: { display: true, text: 'Cotação (horário BRT)' } }
     },
     plugins: {
       legend: { position: 'bottom' },
       tooltip: { callbacks: {
-        label: ctx => ctx.dataset.label + ': R$ ' + ctx.parsed.y.toLocaleString('pt-BR')
+        label: ctx => ctx.dataset.label + ': {{currency_symbol}} ' + ctx.parsed.y.toLocaleString('pt-BR')
       }}
     }
   }
@@ -343,8 +343,8 @@ new Chart(ctx, {
 """
 
 
-def _fmt_brl(n: float) -> str:
-    s = f"R$ {n:,.2f}"
+def _fmt_brl(n: float, symbol: str = "R$") -> str:
+    s = f"{symbol} {n:,.2f}"
     return s.replace(",", "X").replace(".", ",").replace("X", ".")
 
 
@@ -362,6 +362,7 @@ def generate_html(storage, config: dict, output_path: str):
     dest_name_str = f"({dest_name})" if dest_name else ""
     arrival_window = (config.get("monitoring") or {}).get("arrival_window")
     window_active = has_window(config)
+    cur_sym = currency_symbol(config["monitoring"].get("currency", "BRL"))
 
     return_date = trip.get("return_date") or None
     is_one_way = not return_date
@@ -412,7 +413,7 @@ def generate_html(storage, config: dict, output_path: str):
             f'<td>{i}</td>'
             f'<td><span class="{badge_cls}">{hub}</span></td>'
             f'<td>{city or "—"}</td>'
-            f'<td class="price {cls}">{_fmt_brl(q["price"])}</td>'
+            f'<td class="price {cls}">{_fmt_brl(q["price"], cur_sym)}</td>'
             f'<td>{q.get("airline") or "—"}</td>'
             f'<td>{_fmt_duration(q.get("duration_min"))}</td>'
             f'<td>{q.get("transfers") or 0}</td>'
@@ -423,7 +424,7 @@ def generate_html(storage, config: dict, output_path: str):
 
     if rows:
         best = rows[0]
-        best_total_str = _fmt_brl(best["price"])
+        best_total_str = _fmt_brl(best["price"], cur_sym)
         best_hub_str = best.get("hub") or "—"
         # Min historico do hub vencedor
         hist_min = storage.get_historical_min_by_hub(
@@ -431,7 +432,7 @@ def generate_html(storage, config: dict, output_path: str):
             trip["outbound_date"], trip["return_date"],
             best_hub_str,
         )
-        historical_min_str = _fmt_brl(hist_min) if hist_min else "—"
+        historical_min_str = _fmt_brl(hist_min, cur_sym) if hist_min else "—"
     else:
         best_total_str = "—"
         best_hub_str = "—"
@@ -459,6 +460,8 @@ def generate_html(storage, config: dict, output_path: str):
         .replace("{{total_quotes}}", str(total_quotes))
         .replace("{{hub_rows}}", hub_rows_html)
         .replace("{{chart_data_json}}", json.dumps(chart_data))
+        .replace("{{currency_code}}", config["monitoring"].get("currency", "BRL"))
+        .replace("{{currency_symbol}}", cur_sym)
     )
 
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)

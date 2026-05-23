@@ -278,8 +278,10 @@ def run_serpapi_round_trip_search(config, storage):
 
     log.info(f"Cotacoes salvas: {saved}")
     log.info("Mais barato por hub:")
+    from filters import currency_symbol
+    sym = currency_symbol(currency)
     for h, (p, a) in sorted(best_per_hub.items(), key=lambda x: x[1][0]):
-        log.info(f"  {h}: R$ {p:>6,.0f}  ({a})")
+        log.info(f"  {h}: {sym} {p:>6,.0f}  ({a})")
     return saved
 
 

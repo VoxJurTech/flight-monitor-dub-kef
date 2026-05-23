@@ -50,3 +50,20 @@ def window_label(config: dict) -> str:
     if w.get("start") and w.get("end"):
         return f"{w['start']}-{w['end']}"
     return ""
+
+
+_CURRENCY_SYMBOLS = {
+    "BRL": "R$",
+    "EUR": "€",
+    "USD": "US$",
+    "GBP": "£",
+    "ISK": "kr",
+}
+
+
+def currency_symbol(code: str) -> str:
+    """Devolve simbolo amigavel para o codigo ISO; fallback = proprio codigo."""
+    if not code:
+        return ""
+    return _CURRENCY_SYMBOLS.get(code.upper(), code.upper())
+

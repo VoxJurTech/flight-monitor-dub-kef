@@ -16,7 +16,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from filters import in_arrival_window, has_window, window_label
+from filters import in_arrival_window, has_window, window_label, currency_symbol
 
 log = logging.getLogger(__name__)
 
@@ -27,6 +27,7 @@ def check_and_alert(storage, config: dict) -> int:
     hubs_by_code = {h["code"]: h for h in config["hubs"]}
     threshold_pct = config["monitoring"].get("alert_min_drop_pct", 10)
     arrival_window = (config.get("monitoring") or {}).get("arrival_window")
+    cur_sym = currency_symbol(config["monitoring"].get("currency", "BRL"))
 
     recipient = os.environ.get("ALERT_RECIPIENT") or config["monitoring"].get("alert_email") or ""
     gmail_user = os.environ.get("GMAIL_USER")
@@ -62,12 +63,12 @@ def check_and_alert(storage, config: dict) -> int:
         if hist_min is None:
             continue  # primeira cotacao, sem base de comparacao
         elif current < hist_min:
-            reason = f"Novo minimo historico! Antes: R$ {hist_min:,.2f} -> agora: R$ {current:,.2f}"
+            reason = f"Novo minimo historico! Antes: {cur_sym} {hist_min:,.2f} -> agora: {cur_sym} {current:,.2f}"
         else:
             drop_pct = ((hist_min - current) / hist_min) * 100
             if drop_pct >= threshold_pct:
-                reason = (f"Queda de {drop_pct:.1f}% (minimo anterior R$ {hist_min:,.2f}, "
-                          f"agora R$ {current:,.2f})")
+                reason = (f"Queda de {drop_pct:.1f}% (minimo anterior {cur_sym} {hist_min:,.2f}, "
+                          f"agora {cur_sym} {current:,.2f})")
 
         if reason:
             if storage.get_alert_count_recent(route_key, hours=12) > 0:
@@ -128,6 +129,7 @@ def _historical_min_excluding_recent(storage, trip, hub: str):
 def _build_email_body(alerts: list[dict], config: dict) -> str:
     trip = config["trip"]
     dashboard_url = config["monitoring"].get("dashboard_url", "")
+    cur_sym = currency_symbol(config["monitoring"].get("currency", "BRL"))
     return_date = trip.get("return_date") or None
     is_one_way = not return_date
     arrow = "&rarr;" if is_one_way else "&harr;"
@@ -152,7 +154,7 @@ def _build_email_body(alerts: list[dict], config: dict) -> str:
         rows_html += f"""
         <tr>
           <td><strong>{a['hub']}</strong> ({a['city'] or '-'})</td>
-          <td>R$ {a['total']:,.2f}</td>
+          <td>{cur_sym} {a['total']:,.2f}</td>
           <td>{a['airline']}</td>
           <td>{dur}</td>
           <td>{a['transfers']} escala(s)</td>
