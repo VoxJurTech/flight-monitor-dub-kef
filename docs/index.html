@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Monitor de Voos DUB&rarr;KEF</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         margin: 0; padding: 24px; background: #f5f7fa; color: #1f2937; }
+  h1 { margin: 0 0 4px; color: #0f172a; }
+  .subtitle { color: #64748b; margin-bottom: 24px; font-size: 14px; }
+  .grid { display: grid; gap: 16px; }
+  .card { background: white; border-radius: 8px; padding: 20px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #1e3a8a; color: white; padding: 10px 8px; text-align: left;
+       position: sticky; top: 0; }
+  td { padding: 8px; border-bottom: 1px solid #e5e7eb; }
+  tr:hover { background: #f9fafb; }
+  .price { font-weight: 600; }
+  .price-best { color: #16a34a; }
+  .price-mid { color: #d97706; }
+  .price-worst { color: #dc2626; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px;
+           font-size: 11px; background: #e0e7ff; color: #3730a3; font-weight: 600; }
+  .badge-direct { background: #dcfce7; color: #166534; }
+  .badge-window { background: #fef3c7; color: #92400e; }
+  tr.in-window td { background: #fffbeb; }
+  tr.in-window:hover td { background: #fef3c7; }
+  .window-info { padding: 8px 12px; background: #fef3c7; border-left: 4px solid #f59e0b;
+                 border-radius: 4px; margin-bottom: 12px; font-size: 13px; color: #92400e; }
+  .chart-wrap { height: 360px; }
+  .footer { text-align: center; color: #9ca3af; font-size: 12px; margin-top: 24px; }
+  .stat-row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .stat { flex: 1; min-width: 160px; }
+  .stat-label { color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value { font-size: 24px; font-weight: 700; color: #0f172a; margin-top: 4px; }
+</style>
+</head>
+<body>
+<h1>Monitor de Voos &mdash; DUB &rarr; KEF (Reykjavik)</h1>
+<div class="subtitle">
+  Ida: <strong>2026-09-27</strong>
+  &middot; 1 adulto(s), Econ&ocirc;mica, com bagagem despachada &middot; Atualizado em 23/05/2026 09:14 BRT
+</div>
+
+<div class="grid">
+
+  <div class="card">
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-label">Melhor preço atual</div>
+        <div class="stat-value">—</div>
+        <div style="color:#64748b; font-size:13px;">via —</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Mínimo histórico (melhor hub)</div>
+        <div class="stat-value">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Hubs cotados</div>
+        <div class="stat-value">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Total cotações no banco</div>
+        <div class="stat-value">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0;">Top opções por hub de conexão (one-way DUB &rarr; KEF)</h2>
+    <div class="window-info">Voos destacados em amarelo tem chegada em <strong>KEF</strong> entre <strong>08:00-12:00</strong> (horario local). Alertas por email so disparam para esses voos.</div>
+    <table>
+      <thead><tr>
+        <th>#</th><th>Hub</th><th>Cidade</th>
+        <th>Preço total</th><th>Companhia(s)</th>
+        <th>Duração</th><th>Escalas</th><th>Chegada KEF</th><th>Atualizado</th>
+      </tr></thead>
+      <tbody>
+        
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0;">Evolução do preço por hub</h2>
+    <div class="chart-wrap"><canvas id="chart"></canvas></div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Cotações do Google Flights via SerpAPI.
+  <strong>Sempre confira no Google Flights antes de comprar.</strong>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+<script>
+const data = {"labels": [], "datasets": []};
+const ctx = document.getElementById('chart').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: data,
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    scales: {
+      y: {
+        title: { display: true, text: 'Preço (BRL)' },
+        ticks: { callback: v => 'R$ ' + v.toLocaleString('pt-BR') }
+      },
+      x: { title: { display: true, text: 'Cotação (horário BRT)' } }
+    },
+    plugins: {
+      legend: { position: 'bottom' },
+      tooltip: { callbacks: {
+        label: ctx => ctx.dataset.label + ': R$ ' + ctx.parsed.y.toLocaleString('pt-BR')
+      }}
+    }
+  }
+});
+</script>
+</body>
+</html>
