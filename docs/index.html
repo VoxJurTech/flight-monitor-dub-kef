@@ -41,7 +41,7 @@
 <h1>Monitor de Voos &mdash; DUB &rarr; KEF (Reykjavik)</h1>
 <div class="subtitle">
   Ida: <strong>2026-09-27</strong>
-  &middot; 1 adulto(s), Econ&ocirc;mica, com bagagem despachada &middot; Atualizado em 23/05/2026 09:14 BRT
+  &middot; 1 adulto(s), Econ&ocirc;mica, com bagagem despachada &middot; Atualizado em 23/05/2026 09:17 BRT
 </div>
 
 <div class="grid">
@@ -50,20 +50,20 @@
     <div class="stat-row">
       <div class="stat">
         <div class="stat-label">Melhor preço atual</div>
-        <div class="stat-value">—</div>
-        <div style="color:#64748b; font-size:13px;">via —</div>
+        <div class="stat-value">R$ 228,00</div>
+        <div style="color:#64748b; font-size:13px;">via DIRECT</div>
       </div>
       <div class="stat">
         <div class="stat-label">Mínimo histórico (melhor hub)</div>
-        <div class="stat-value">—</div>
+        <div class="stat-value">R$ 228,00</div>
       </div>
       <div class="stat">
         <div class="stat-label">Hubs cotados</div>
-        <div class="stat-value">0</div>
+        <div class="stat-value">6</div>
       </div>
       <div class="stat">
         <div class="stat-label">Total cotações no banco</div>
-        <div class="stat-value">0</div>
+        <div class="stat-value">12</div>
       </div>
     </div>
   </div>
@@ -78,7 +78,7 @@
         <th>Duração</th><th>Escalas</th><th>Chegada KEF</th><th>Atualizado</th>
       </tr></thead>
       <tbody>
-        
+        <tr><td>1</td><td><span class="badge badge-direct">DIRECT</span></td><td>—</td><td class="price price-best">R$ 228,00</td><td>Icelandair</td><td>2h35</td><td>0</td><td>13:50</td><td>23/05/2026 09:17 BRT</td></tr><tr><td>2</td><td><span class="badge">AMS</span></td><td>Amsterdam</td><td class="price price-best">R$ 231,00</td><td>KLM + Scandinavian Airlines</td><td>11h20</td><td>2</td><td>16:15</td><td>23/05/2026 09:17 BRT</td></tr><tr class="in-window"><td>3</td><td><span class="badge">CPH</span></td><td>Copenhagen</td><td class="price price-best">R$ 286,00</td><td>Scandinavian Airlines</td><td>15h35</td><td>1</td><td><span class="badge badge-window">09:40</span></td><td>23/05/2026 09:17 BRT</td></tr><tr class="in-window"><td>4</td><td><span class="badge">ARN</span></td><td>Stockholm</td><td class="price price-mid">R$ 371,00</td><td>Scandinavian Airlines</td><td>16h10</td><td>2</td><td><span class="badge badge-window">10:25</span></td><td>23/05/2026 09:17 BRT</td></tr><tr><td>5</td><td><span class="badge">FRA</span></td><td>Frankfurt</td><td class="price price-mid">R$ 404,00</td><td>Lufthansa + Austrian</td><td>12h00</td><td>2</td><td>23:20</td><td>23/05/2026 09:17 BRT</td></tr><tr class="in-window"><td>6</td><td><span class="badge">LHR</span></td><td>London Heathrow</td><td class="price price-mid">R$ 410,00</td><td>British Airways</td><td>14h15</td><td>1</td><td><span class="badge badge-window">09:45</span></td><td>23/05/2026 09:17 BRT</td></tr>
       </tbody>
     </table>
   </div>
@@ -97,7 +97,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 <script>
-const data = {"labels": [], "datasets": []};
+const data = {"labels": ["23/05 09:17"], "datasets": [{"label": "DIRECT", "data": [228.0], "borderColor": "#2563eb", "backgroundColor": "#2563eb33", "tension": 0.2, "spanGaps": true}, {"label": "AMS (Amsterdam)", "data": [231.0], "borderColor": "#dc2626", "backgroundColor": "#dc262633", "tension": 0.2, "spanGaps": true}, {"label": "CPH (Copenhagen)", "data": [286.0], "borderColor": "#16a34a", "backgroundColor": "#16a34a33", "tension": 0.2, "spanGaps": true}, {"label": "ARN (Stockholm)", "data": [371.0], "borderColor": "#9333ea", "backgroundColor": "#9333ea33", "tension": 0.2, "spanGaps": true}, {"label": "FRA (Frankfurt)", "data": [404.0], "borderColor": "#ea580c", "backgroundColor": "#ea580c33", "tension": 0.2, "spanGaps": true}, {"label": "LHR (London Heathrow)", "data": [410.0], "borderColor": "#0891b2", "backgroundColor": "#0891b233", "tension": 0.2, "spanGaps": true}]};
 const ctx = document.getElementById('chart').getContext('2d');
 new Chart(ctx, {
   type: 'line',
