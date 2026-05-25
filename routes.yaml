@@ -46,7 +46,7 @@ constraints:
 # 4. MONITORING
 # -----------------------------------------------------------------------------
 monitoring:
-  currency: EUR                     # Trecho europeu, default EUR
+  currency: BRL                     # Trecho europeu, default EUR
   dashboard_url: "https://voxjurtech.github.io/flight-monitor-dub-kef/"
   alert_email: ""                   # Fallback (real fica em ALERT_RECIPIENT secret)
   alert_min_drop_pct: 10
