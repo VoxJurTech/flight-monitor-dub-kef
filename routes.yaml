@@ -52,8 +52,8 @@ monitoring:
   alert_min_drop_pct: 10
   full_sweep_dow: 0
   top_n_for_serpapi: 3
-  # Voos elegiveis para alerta: chegada em KEF entre 08:00 e 12:00 (hora local).
+  # Voos elegiveis para alerta: chegada em KEF entre 06:00 e 09:00 (hora local).
   # Islandia nao tem horario de verao, KEF = UTC+0 ano inteiro.
   arrival_window:
-    start: "08:00"
-    end:   "12:00"
+    start: "06:00"
+    end:   "09:00"
